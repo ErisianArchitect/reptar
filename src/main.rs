@@ -46,8 +46,7 @@ impl Width {
             Width::Term => Self::internal_get_term_width(),
             Width::TermPercent(percent) => {
                 let term_width = Self::internal_get_term_width() as f64;
-                let mul = percent / 100.0;
-                let percent_width = term_width * mul;
+                let percent_width = term_width * percent;
                 let term_width = percent_width.floor() as usize;
                 term_width
             }
