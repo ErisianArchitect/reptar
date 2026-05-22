@@ -69,15 +69,13 @@ impl std::str::FromStr for Width {
             "half"
             | "Half"
             | "HALF" => {
-                Ok(Self::TermPercent(50.0))
+                Ok(Self::TermPercent(0.5))
             }
             percent if percent.ends_with('%')
                  && let Ok(percent) = percent[..percent.len() - 1].parse::<f64>()
             => {
-                let term_width = Self::internal_get_term_width() as f64;
                 let mul = percent / 100.0;
-                let percent_width = term_width * mul;
-                Ok(Self::TermPercent(percent_width))
+                Ok(Self::TermPercent(mul))
             }
             int if let Ok(int @ 1..) = int.parse::<usize>() => {
                 Ok(Self::Int(int))
@@ -114,8 +112,63 @@ struct Reptar {
     text_or_path: String,
 }
 
+#[cfg(target_os = "linux")]
+macro_rules! target_os {
+    () => { "linux" };
+}
+
+#[cfg(target_os = "macos")]
+macro_rules! target_os {
+    () => { "macos" };
+}
+
+#[cfg(target_os = "windows")]
+macro_rules! target_os {
+    () => { "windows" };
+}
+
+#[cfg(target_pointer_width = "64")]
+macro_rules! target_pointer_width {
+    () => { "64" };
+}
+
+#[cfg(target_pointer_width = "32")]
+macro_rules! target_pointer_width {
+    () => { "32" };
+}
+
+#[cfg(target_pointer_width = "16")]
+macro_rules! target_pointer_width {
+    () => { "16" };
+}
+
+const VERSION_STRING: &'static str = concat!(
+    env!("CARGO_PKG_NAME"),
+    " - v",
+    env!("CARGO_PKG_VERSION"),
+    " (",
+    target_os!(),
+    "-",
+    target_pointer_width!(), "-bit",
+    ")"
+);
+
 fn main() {
-    let args = Reptar::parse();
+    let args = std::env::args().collect::<Vec<_>>();
+    if args.len() == 2 {
+        match args[1].as_str() {
+            "--version" | "-v" => {
+                if let Ok(current_exe_path) = std::env::current_exe() {
+                    println!("{VERSION_STRING} <\"{}\">", current_exe_path.display());
+                } else {
+                    println!("{VERSION_STRING}");
+                }
+                return;
+            }
+            _ => (),
+        }
+    }
+    let args = Reptar::parse_from(args);
     let width = args.width.get();
     let mut opts = Options::new(width);
     let separator = match args.separator {

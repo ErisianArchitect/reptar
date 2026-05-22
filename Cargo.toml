@@ -7,7 +7,7 @@ repository = "https://github.com/ErisianArchitect/reptar"
 documentation = "https://docs.rs/reptar"
 license = "MIT"
 license-file = "LICENSE"
-version = "0.1.2-indev"
+version = "0.2.0-indev"
 edition = "2024"
 
 [features]
