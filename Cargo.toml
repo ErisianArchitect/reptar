@@ -5,18 +5,14 @@ description = "CLI program for wrapping text."
 authors = ["Ada F. <https://github.com/ErisianArchitect>"]
 repository = "https://github.com/ErisianArchitect/reptar"
 documentation = "https://docs.rs/reptar"
+license = "MIT"
 license-file = "LICENSE"
-version = "0.1.0-indev"
+version = "0.1.1-indev"
 edition = "2024"
 
 [features]
 default = []
 cli = []
-
-[[bin]]
-name = "reptar"
-path = "./src/main.rs"
-required-features = ["cli"]
 
 [dependencies]
 clap = { version = "4.6.1", features = ["derive"] }
