@@ -1,0 +1,26 @@
+
+[package]
+name = "reptar"
+description = "CLI program for wrapping text."
+authors = ["Ada F. <https://github.com/ErisianArchitect>"]
+repository = "https://github.com/ErisianArchitect/reptar"
+documentation = "https://docs.rs/reptar"
+license-file = "LICENSE"
+version = "0.1.0"
+edition = "2024"
+
+[features]
+default = []
+cli = []
+
+[[bin]]
+name = "reptar"
+path = "./src/main.rs"
+required-features = ["cli"]
+
+[dependencies]
+clap = { version = "4.6.1", features = ["derive"] }
+crossterm = "0.29.0"
+estrogen = "0.1.0-indev"
+textwrap = "0.16.2"
+uranus = "0.1.0"
