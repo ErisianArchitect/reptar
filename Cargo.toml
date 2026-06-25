@@ -6,8 +6,7 @@ authors = ["Ada F. <https://github.com/ErisianArchitect>"]
 repository = "https://github.com/ErisianArchitect/reptar"
 documentation = "https://docs.rs/reptar"
 license = "MIT"
-license-file = "LICENSE"
-version = "0.2.0-indev"
+version = "0.3.0-indev"
 edition = "2024"
 
 [features]
