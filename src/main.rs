@@ -1,5 +1,8 @@
 #![doc = uranus::readme_text!()]
 
+use std::io::{IsTerminal, Read};
+use std::borrow::Cow;
+
 use textwrap::{Options};
 use clap::{
     Parser,
@@ -109,7 +112,7 @@ struct Reptar {
     #[arg(long, short)]
     file: bool,
     /// The text to be wrapped or the path to the file containing the text to be wrapped (must use --file flag for path input).
-    text_or_path: String,
+    text_or_path: Option<String>,
 }
 
 #[cfg(target_os = "linux")]
@@ -180,13 +183,33 @@ fn main() {
         opts = opts.initial_indent(indent);
     }
     opts = opts.word_separator(separator);
-
-    let text = if args.file {
-        std::fs::read_to_string(args.text_or_path).expect("Failed to read file.\nSorry there's not a better error message.")
+    let mut stdin = std::io::stdin().lock();
+    let mut buf_holder = None;
+    let text = if stdin.is_terminal() {
+        Cow::Owned(if let Some(text_or_path) = args.text_or_path {
+            if args.file {
+                std::fs::read_to_string(text_or_path).expect("Failed to read file.\nSorry there's not a better error message.")
+            } else {
+                text_or_path
+            }
+        } else {
+            if args.file {
+                panic!("Missing file path argument.");
+            } else {
+                panic!("Missing text argument.")
+            }
+        })
     } else {
-        args.text_or_path
+        buf_holder = Some(Vec::with_capacity(512));
+        let buf = buf_holder.as_mut().unwrap();
+        stdin.read_to_end(buf).expect("Failed to read from stdin.");
+        Cow::Borrowed(str::from_utf8(buf).expect("Invalid UTF-8."))
     };
-    
-    let wrapped = textwrap::fill(text.as_str(), opts);
-    println!("{wrapped}");
+    let wrapped = textwrap::fill(text.as_ref(), opts);
+    if stdin.is_terminal() {
+        println!("{wrapped}");
+    } else {
+        print!("{wrapped}");
+    }
+    drop(buf_holder);
 }
